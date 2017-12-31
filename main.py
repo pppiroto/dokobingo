@@ -20,7 +20,7 @@ from flask import Flask, render_template, request
 # [END imports]
 
 # [START create_app]
-app = Flask(__name__)
+app = Flask(__name__, static_folder='app')
 # [END create_app]
 
 
