@@ -13,6 +13,7 @@
             "port": 3000,
             "secret": "gae",
             "host": "localhost",
+            "preLaunchTask": "python"
         },
         {
             "name": "Python",
