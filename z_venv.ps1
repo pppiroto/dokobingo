@@ -1,0 +1,1 @@
+. "C:\workspaces\venv\gaeflask\Scripts\activate.ps1"
