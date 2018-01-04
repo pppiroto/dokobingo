@@ -16,13 +16,16 @@
 import logging
 
 # [START imports]
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect
 # [END imports]
 
 # [START create_app]
 app = Flask(__name__, static_folder='app')
 # [END create_app]
 
+@app.route('/', methods=['GET'])
+def redirect_ui_root():
+    return redirect("/bingo/index.html")
 
 # [START form]
 @app.route('/form')
