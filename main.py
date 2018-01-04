@@ -27,6 +27,10 @@ app = Flask(__name__, static_folder='app')
 def redirect_ui_root():
     return redirect("/bingo/index.html")
 
+@app.route('/bingo', methods=['GET'])
+def redirect_ui_bingo():
+    return redirect("/bingo/index.html")
+
 # [START form]
 @app.route('/form')
 def form():
