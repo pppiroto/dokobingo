@@ -15,12 +15,14 @@ Before running or deploying this application, install the dependencies using
 
 For more information, see the [App Engine Standard README](../../README.md)
 
-
 # チュートリアル
 https://cloud.google.com/appengine/docs/standard/python/getting-started/python-standard-env
 
-# 手順
+# 実行手順
 http://typea.info/blg/glob/2017/12/google-app-engine-flask-vs-code.html
+
+ctrl + shift + p : ビルドタスクの実行
+実行後デバッグビューからアタッチする
 
 ## git
 git init
@@ -36,3 +38,4 @@ git push -u origin master
 
 git tag tagname
 git push oring --tags
+

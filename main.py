@@ -14,20 +14,25 @@
 
 # [START app]
 import logging
+import uuid
 
 # [START imports]
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, session, abort
 # [END imports]
 
 # [START create_app]
 app = Flask(__name__, static_folder='app')
+app.secret_key = 'ognibokod'
 # [END create_app]
 
 @app.route('/', methods=['GET'])
 def redirect_ui_root():
-    return redirect("/bingo/index.html")
+    redirect_to_index = redirect("/bingo/index.html")
+    response = app.make_response(redirect_to_index)
+    response.set_cookie('XSRF-TOKEN',generate_csrf_token(),expires=0,path='/')
+    return response
 
-@app.route('/bingo', methods=['GET'])
+@app.route('/bingo/', methods=['GET'])
 def redirect_ui_bingo():
     return redirect("/bingo/index.html")
 
@@ -36,7 +41,6 @@ def redirect_ui_bingo():
 def form():
     return render_template('form.html')
 # [END form]
-
 
 # [START submitted]
 @app.route('/submitted', methods=['POST'])
@@ -57,9 +61,25 @@ def submitted_form():
     # [END render_template]
 
 
+@app.route('/hello', methods=['POST'])
+def api_hello():
+    return "hello"
+
+@app.errorhandler(403)
 @app.errorhandler(500)
 def server_error(e):
-    # Log the error and stacktrace.
-    logging.exception('An error occurred during a request.')
-    return 'An internal error occurred.', 500
+    logging.exception(e)
+    return 'an error occurred.', e.code
+
+@app.before_request
+def csrf_protect():
+    if request.method == "POST":
+        token = session.pop('_csrf_token', None)
+        if not token or token != request.form.get('_csrf_token'):
+            abort(403)
+
+def generate_csrf_token():
+    if '_csrf_token' not in session:
+        session['_csrf_token'] = value=str(uuid.uuid4())
+    return session['_csrf_token']
 # [END app]
