@@ -25,16 +25,18 @@ app = Flask(__name__, static_folder='app')
 app.secret_key = 'ognibokod'
 # [END create_app]
 
-@app.route('/', methods=['GET'])
-def redirect_ui_root():
-    redirect_to_index = redirect("/bingo/index.html")
-    response = app.make_response(redirect_to_index)
-    response.set_cookie('XSRF-TOKEN',generate_csrf_token(),expires=0,path='/')
+def redirect_ui_index_with_crsftoken():
+    response = app.make_response(redirect("/bingo/index.html"))
+    response.set_cookie('XSRF-TOKEN', value=generate_csrf_token()) 
     return response
 
-@app.route('/bingo/', methods=['GET'])
-def redirect_ui_bingo():
-    return redirect("/bingo/index.html")
+@app.route('/', methods=['GET'])
+def redirect_ui_root():
+    return redirect_ui_index_with_crsftoken()
+
+@app.route('/bingo/<sub>', methods=['GET'])
+def redirect_ui_bingo(sub):
+    return redirect_ui_index_with_crsftoken()
 
 # [START form]
 @app.route('/form')
@@ -61,8 +63,10 @@ def submitted_form():
     # [END render_template]
 
 
-@app.route('/hello', methods=['POST'])
+@app.route('/api/hello', methods=['POST'])
 def api_hello():
+    print '%s' % (request.json)
+
     return "hello"
 
 @app.errorhandler(403)
@@ -75,11 +79,11 @@ def server_error(e):
 def csrf_protect():
     if request.method == "POST":
         token = session.pop('_csrf_token', None)
-        if not token or token != request.form.get('_csrf_token'):
+        if not token or token != request.headers.get('X-XSRF-TOKEN'):
             abort(403)
 
 def generate_csrf_token():
     if '_csrf_token' not in session:
-        session['_csrf_token'] = value=str(uuid.uuid4())
+        session['_csrf_token'] = str(uuid.uuid4())
     return session['_csrf_token']
 # [END app]
