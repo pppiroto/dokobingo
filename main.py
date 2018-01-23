@@ -17,8 +17,10 @@ import logging
 import uuid
 
 # [START imports]
-from flask import Flask, render_template, request, redirect, session, abort
+from flask import Flask, render_template, request, redirect, session, abort, jsonify
 # [END imports]
+
+CSRF_TOKE = '_csrf_token'
 
 # [START create_app]
 app = Flask(__name__, static_folder='app')
@@ -65,9 +67,9 @@ def submitted_form():
 
 @app.route('/api/hello', methods=['POST'])
 def api_hello():
-    print '%s' % (request.json)
+    name = request.json['params']['name']
 
-    return "hello"
+    return jsonify({"result":{"name":name}})
 
 @app.errorhandler(403)
 @app.errorhandler(500)
@@ -78,12 +80,12 @@ def server_error(e):
 @app.before_request
 def csrf_protect():
     if request.method == "POST":
-        token = session.pop('_csrf_token', None)
+        token = session[CSRF_TOKE]
         if not token or token != request.headers.get('X-XSRF-TOKEN'):
             abort(403)
 
 def generate_csrf_token():
-    if '_csrf_token' not in session:
-        session['_csrf_token'] = str(uuid.uuid4())
-    return session['_csrf_token']
+    if CSRF_TOKE not in session:
+        session[CSRF_TOKE] = str(uuid.uuid4())
+    return session[CSRF_TOKE]
 # [END app]
