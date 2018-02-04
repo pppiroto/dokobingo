@@ -20,7 +20,7 @@ import uuid
 from flask import Flask, render_template, request, redirect, session, abort, jsonify
 # [END imports]
 
-CSRF_TOKE = '_csrf_token'
+CSRF_TOKEN = '_csrf_token'
 
 # [START create_app]
 app = Flask(__name__, static_folder='app')
@@ -29,7 +29,7 @@ app.secret_key = 'ognibokod'
 
 def redirect_ui_index_with_crsftoken():
     response = app.make_response(redirect("/bingo/index.html"))
-    response.set_cookie('XSRF-TOKEN', value=generate_csrf_token()) 
+    response.set_cookie('XSRF-TOKEN', value=generate_csrf()) 
     return response
 
 @app.route('/', methods=['GET'])
@@ -67,6 +67,9 @@ def submitted_form():
 
 @app.route('/api/hello', methods=['POST'])
 def api_hello():
+    # http://conta.hatenablog.com/entry/2013/02/06/162829
+    # Content-Type:application/json の場合、request.json が利用可能
+    # app.logger.info(request.headers['Content-Type'])
     name = request.json['params']['name']
 
     return jsonify({"result":{"name":name}})
@@ -80,12 +83,12 @@ def server_error(e):
 @app.before_request
 def csrf_protect():
     if request.method == "POST":
-        token = session[CSRF_TOKE]
+        token = session[CSRF_TOKEN]
         if not token or token != request.headers.get('X-XSRF-TOKEN'):
             abort(403)
 
-def generate_csrf_token():
-    if CSRF_TOKE not in session:
-        session[CSRF_TOKE] = str(uuid.uuid4())
-    return session[CSRF_TOKE]
+def generate_csrf():
+    if CSRF_TOKEN not in session:
+        session[CSRF_TOKEN] = str(uuid.uuid4())
+    return session[CSRF_TOKEN]
 # [END app]
