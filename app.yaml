@@ -4,8 +4,8 @@ threadsafe: true
 
 # [START handlers]
 handlers:
-- url: /bingo
-  static_dir: bingo
+#- url: /bingo
+#  static_dir: bingo
 - url: /.*
   script: main.app
 # [END handlers]

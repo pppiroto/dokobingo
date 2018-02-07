@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright 2016 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,13 +18,14 @@ import logging
 import uuid
 
 # [START imports]
-from flask import Flask, render_template, request, redirect, session, abort, jsonify
+from flask import Flask, render_template, request, redirect, session, abort, jsonify, send_from_directory
+import re
 # [END imports]
 
 CSRF_TOKEN = '_csrf_token'
 
 # [START create_app]
-app = Flask(__name__, static_folder='app')
+app = Flask(__name__, static_folder='')
 app.secret_key = 'ognibokod'
 # [END create_app]
 
@@ -36,34 +38,17 @@ def redirect_ui_index_with_crsftoken():
 def redirect_ui_root():
     return redirect_ui_index_with_crsftoken()
 
-@app.route('/bingo/<sub>', methods=['GET'])
-def redirect_ui_bingo(sub):
+@app.route('/bingo/')
+def get_app_root():
     return redirect_ui_index_with_crsftoken()
 
-# [START form]
-@app.route('/form')
-def form():
-    return render_template('form.html')
-# [END form]
-
-# [START submitted]
-@app.route('/submitted', methods=['POST'])
-def submitted_form():
-    name = request.form['name']
-    email = request.form['email']
-    site = request.form['site_url']
-    comments = request.form['comments']
-
-    # [END submitted]
-    # [START render_template]
-    return render_template(
-        'submitted_form.html',
-        name=name,
-        email=email,
-        site=site,
-        comments=comments)
-    # [END render_template]
-
+@app.route('/bingo/<path:path>')
+def get_static_file(path):
+    # https://stackoverflow.com/questions/20646822/how-to-serve-static-files-in-flask
+    if re.match(r'(room)',path):
+        return redirect_ui_index_with_crsftoken()
+    else:
+        return send_from_directory('bingo', path)
 
 @app.route('/api/hello', methods=['POST'])
 def api_hello():
@@ -92,3 +77,27 @@ def generate_csrf():
         session[CSRF_TOKEN] = str(uuid.uuid4())
     return session[CSRF_TOKEN]
 # [END app]
+
+## [START form]
+#@app.route('/form')
+#def form():
+#    return render_template('form.html')
+## [END form]
+#
+## [START submitted]
+#@app.route('/submitted', methods=['POST'])
+#def submitted_form():
+#    name = request.form['name']
+#    email = request.form['email']
+#    site = request.form['site_url']
+#    comments = request.form['comments']
+#
+#    # [END submitted]
+#    # [START render_template]
+#    return render_template(
+#        'submitted_form.html',
+#        name=name,
+#        email=email,
+#        site=site,
+#        comments=comments)
+#    # [END render_template]

@@ -39,3 +39,6 @@ git push -u origin master
 git tag tagname
 git push oring --tags
 
+## GCloud
+cd "C:\workspaces\dokobingo\dokobingo"
+gcloud app deploy
