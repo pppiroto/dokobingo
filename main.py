@@ -20,6 +20,7 @@ import uuid
 # [START imports]
 from flask import Flask, render_template, request, redirect, session, abort, jsonify, send_from_directory
 import re
+from model import Room
 # [END imports]
 
 CSRF_TOKEN = '_csrf_token'
@@ -49,6 +50,17 @@ def get_static_file(path):
         return redirect_ui_index_with_crsftoken()
     else:
         return send_from_directory('bingo', path)
+
+@app.route('/api/create_room', methods=['POST'])
+def api_create_room():        
+    user = request.json['user']
+    
+    room_name = "%s's Room" % (user['name'])
+    
+    room = Room(name=room_name)
+    room.put()
+
+    return jsonify({"room":{"name":room_name}})
 
 @app.route('/api/hello', methods=['POST'])
 def api_hello():

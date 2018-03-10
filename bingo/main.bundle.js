@@ -63,8 +63,8 @@ var AccountService = (function () {
     AccountService.prototype.getUser = function () {
         return this.user;
     };
-    AccountService.prototype.getLoginInfo = function () {
-        this.getSnsLoginUserInfo();
+    AccountService.prototype.updateLoginInfo = function () {
+        return this.getSnsLoginUserInfo();
     };
     AccountService.prototype.announceUserChange = function (user) {
         this.userChangeAnnouncedSource.next(user);
@@ -383,6 +383,11 @@ var DokobingoService = (function () {
     }
     DokobingoService.prototype.configureRequest = function (req) {
     };
+    DokobingoService.prototype.createRoom = function (user) {
+        var headers = new http_1.HttpHeaders()
+            .set("Content-Type", "application/json");
+        return this.http.post('/api/create_room', JSON.stringify({ user: user }), { headers: headers });
+    };
     DokobingoService.prototype.hello = function (name) {
         var headers = new http_1.HttpHeaders()
             .set("Content-Type", "application/json");
@@ -578,7 +583,7 @@ module.exports = module.exports.toString();
 /***/ "../../../../../src/app/room/room.component.html":
 /***/ (function(module, exports) {
 
-module.exports = "<p>\n  room works!\n</p>\n<p>\n  <button mat-button (click)='apiTest()'>API Test {{hello?.result.name}}</button>\n</p>\n"
+module.exports = "<p>\n  <button mat-button (click)='createRoom()'>Create Room {{room?.room.name}}</button>\n</p>\n<p>\n  <button mat-button (click)='apiTest()'>API Test {{hello?.result.name}}</button>\n</p>\n"
 
 /***/ }),
 
@@ -606,6 +611,15 @@ var RoomComponent = (function () {
         this.bingoService = bingoService;
     }
     RoomComponent.prototype.ngOnInit = function () {
+    };
+    RoomComponent.prototype.createRoom = function () {
+        var _this = this;
+        this.bingoService.createRoom(this.accountService.getUser()).subscribe(function (response) {
+            _this.room = response;
+            console.log(_this.room);
+        }, function (error) {
+            console.log(error);
+        });
     };
     RoomComponent.prototype.apiTest = function () {
         var _this = this;
