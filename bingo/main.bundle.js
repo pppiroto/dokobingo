@@ -138,10 +138,14 @@ var AccountService = (function () {
      */
     AccountService.prototype.createUserInfo = function (sns, json) {
         this.user.sns = sns;
-        this.user.id = json.id;
+        this.user.sns_id = json.id;
         this.user.name = json.name;
         this.user.thumbnail = json.thumbnail;
-        console.log(json);
+        this.bingoService.login(this.user).subscribe(function (response) {
+            console.log(response);
+        }, function (error) {
+            console.log(error);
+        });
         return this.user;
     };
     AccountService = __decorate([
@@ -377,20 +381,20 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var core_1 = __webpack_require__("../../../core/esm5/core.js");
 var http_1 = __webpack_require__("../../../common/esm5/http.js");
+var headers = new http_1.HttpHeaders().set("Content-Type", "application/json");
 var DokobingoService = (function () {
     function DokobingoService(http) {
         this.http = http;
     }
     DokobingoService.prototype.configureRequest = function (req) {
     };
+    DokobingoService.prototype.login = function (user) {
+        return this.http.post('/api/login_user', JSON.stringify({ user: user }), { headers: headers });
+    };
     DokobingoService.prototype.createRoom = function (user) {
-        var headers = new http_1.HttpHeaders()
-            .set("Content-Type", "application/json");
         return this.http.post('/api/create_room', JSON.stringify({ user: user }), { headers: headers });
     };
     DokobingoService.prototype.hello = function (name) {
-        var headers = new http_1.HttpHeaders()
-            .set("Content-Type", "application/json");
         // https://qiita.com/ponday/items/1ec0e500cd801286845e
         // https://blog.angular-university.io/angular-http/
         return this.http.post('/api/hello', JSON.stringify({ params: { name: name } }), { headers: headers });
@@ -671,8 +675,9 @@ var User = (function () {
     function User() {
     }
     User.prototype.reset = function () {
-        this.sns = "";
         this.id = "";
+        this.sns = "";
+        this.sns_id = "";
         this.name = "";
         this.thumbnail = "";
         return this;
